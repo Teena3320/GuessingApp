@@ -1,31 +1,34 @@
 /**
 * MAIN CLASS
 * 
-* Use case 5: Game Result Storage
+* Use case 6: Game Restart & Exit
 * 
-* This class coordinates the complete game flow
-* and persists the final result after completion.
+* This class coordinates the complete game lifecycle,
+* allowing the player replay or exit gracefully.
 * 
 * Responsibilities:
-* - Initialize game configuration
-* - Accept and validate user guesses
-* - Generate hints when applicable
-* - Store game result at the end
+* - Start a new game session
+* - Execute the guessing flow
+* - Persist game results
+* - Restart or exit based on user choice
 * 
 * @author Developer
-* @version 5.0
+* @version 6.0
 */
 
 import java.util.Scanner;
 
 public class GuessingApp {
 	public static void main(String[] args) throws InvalidInputException{
+		Scanner scanner = new Scanner(System.in);
+		boolean restart;
+		
 		System.out.println("===========================");
 		System.out.println("Welcome to the Guessing App");
 		System.out.println("===========================\n");
-
+	do {
 		System.out.print("Enter Player Name:");
-		Scanner scanner = new Scanner(System.in);
+		
 		String player = scanner.nextLine();
 
 		GameConfig config = new GameConfig();
@@ -41,7 +44,7 @@ public class GuessingApp {
 			
 			String result = GuessValidator.validateGuess(guess, config.getTargetNumber());
 			
-			if(!"CORRECT".equals(result) && attempts < config.getMaxHints()){
+			if(!"CORRECT".equals(result) && attempts <= config.getMaxHints()){
 				System.out.println(HintService.generateHint(config.getTargetNumber(), attempts));
 			}
 			System.out.println(result);
@@ -52,5 +55,8 @@ public class GuessingApp {
 			}
 		}
 		StorageService.saveResult(player,attempts,win);
+		restart = GameController.restartGame(scanner);
+	}
+	while(restart);
 	}
 }
